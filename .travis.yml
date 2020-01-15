@@ -1,0 +1,141 @@
+sudo: required
+
+language: node_js
+node_js:
+- 8
+
+branches:
+  only:
+  - master
+
+# travis runtime environment from here or settings. : https://docs.travis-ci.com/user/environment-variables/
+env:
+  global:
+  - ZIP_FILE="lambda-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip"
+
+  # travis-ci secure doc : https://docs.travis-ci.com/user/encryption-keys/
+  # before install travis , first install ruby & gem
+  # $ gem install travis
+  # $ travis encrypt SOMEVAR="secretvalue"
+
+  # AWS_ACCESS_KEY_ID_DEV
+  - secure: ""
+  # AWS_SECRET_ACCESS_KEY_DEV
+  - secure: ""
+  # AWS_ACCESS_KEY_ID_STG
+  - secure: ""
+  # AWS_SECRET_ACCESS_KEY_STG
+  - secure: ""
+  # AWS_ACCESS_KEY_ID_PROD , value : AKI....QMQ
+  -
+  # AWS_SECRET_ACCESS_KEY_PROD
+  -
+
+  # global variables
+  - AWS_ACCESS_KEY_ID=''
+  - AWS_SECRET_ACCESS_KEY=''
+  - AWS_REGION='ap-northeast-1'
+  - CODEDEPLOY_APP_NAME=''
+  - CODEDEPLOY_GROUP=''
+
+
+# notification - https://docs.travis-ci.com/user/notifications
+# notifications:
+#   email:
+#     recipients:
+#       - one@example.com
+#       - other@example.com
+#     on_success: never # default: change
+#     on_failure: always # default: always
+# integration to slack , setup on slack travis-ci app
+notifications:
+  email:
+    on_failure: always
+    on_success: never
+  slack:
+    rooms:
+    - secure: "OWaHJYnY7E/gcAxgqHUl5wqwc6oi1su77T2ixxmTl8hvO+fH66MQN9Mm1Ay6d5oaQqX4BNic9GdS7FI8h/osyHAf6NNhFZJleIzm9h3vWjlNh9ADwGbWRskue+6SyKY2vdB5HPiwstGUQoZ8/51wR19T43DwQ15dyCQKxg+WwK39+D3ps933wvFJsCQ+2RSLdImIN8B1CjpIbWxStBocZOprqxThAlYfupvMYrrRDt7mlVeMAnvXE4TmMfHdYXtKe9hc/mEfbCryL/CxN8e2JR1U2ropdkfmDOavPoc4PGtf+C3E5pLCm/rNx6Ldy2Y97qMSv6AuyHCMm8ie495wscRB2OmW7JIwRsFRg0jrJcm5CH/cS/Oy2wnmzPElQ50GcESh84E9HSV5tXF8iARHERVz1DF3PbJRRAd/KEyWcU+J/wbub3XX0PAsWBHix4BnvNgvwMbb0/Ie7UaCeZMzF0DQVopLd51DNIuTTmP/V9kpbEFgok2qatUrb2FiRNyRQVPYwQx8mRlS9sgGk7tChSTHsrqcS6/apmKUPAbI4NBPbB0BZBDlC/rHDr3iq77ht8DUcQnwJpXedIhHg7FAcHmRRuzC7+9gBiS/1g9/HjGkH46TaaR4P71s+BoOFVYfc2NTTAzqtxy6Fh1OWktK2WwdVEEk+mXEm0OQa9Cl1T8="
+
+cache:
+  directories:
+  - $COMPOSER_CACHE_DIR
+  - $HOME/.composer/cache
+
+
+
+
+# build lifecycle - https://docs.travis-ci.com/user/customizing-the-build/
+# (OPTIONAL) Install apt addons
+# (OPTIONAL) Install cache components
+# before_install
+# install
+# before_script
+# script
+# (OPTIONAL) before_cache (for cleaning up cache)
+# after_success or after_failure
+# (OPTIONAL) before_deploy
+# (OPTIONAL) deploy
+# (OPTIONAL) after_deploy
+# after_script
+
+# set -e : when error stop build.
+before_install:
+- set -e
+- echo `date +"%Y-%m-%d %H:%M:%S"`
+- echo $TRAVIS_BRANCH
+- if [[ $TRAVIS_BRANCH == "dev" ]]; then
+    AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DEV;
+    AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DEV;
+    S3_BUCKET='';
+    CODEDEPLOY_APP='';
+    CODEDEPLOY_GROUP='';
+  fi
+- if [[ $TRAVIS_BRANCH == "staging" ]]; then
+    AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_STG;
+    AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_STG;
+    S3_BUCKET='';
+    CODEDEPLOY_APP='';
+    CODEDEPLOY_GROUP='';
+  fi
+- if [[ $TRAVIS_BRANCH == "master" ]]; then
+    AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_PROD;
+    AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_PROD;
+    S3_BUCKET='afgsfhdyur5joi868682333';
+    CODEDEPLOY_APP='a1-EC2-CodeDeploy';
+    CODEDEPLOY_GROUP='ec2';
+  fi
+
+
+# put testing scripts here
+script:
+- echo 'script step...'
+
+before_deploy:
+- cd "$TRAVIS_BUILD_DIR";
+  mkdir "$TRAVIS_BUILD_DIR/zip";
+  zip -r "$TRAVIS_BUILD_DIR/zip/$ZIP_FILE" *
+
+
+deploy:
+- provider: S3
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  region: $AWS_REGION
+  local_dir: $TRAVIS_BUILD_DIR/zip
+  bucket: $S3_BUCKET
+  skip_cleanup: true
+  on:
+    all_branches: true
+
+- provider: codedeploy
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  region: $AWS_REGION
+  bucket: $S3_BUCKET
+  key: $ZIP_FILE
+  bundle_type: zip
+  application: $CODEDEPLOY_APP
+  deployment_group: $CODEDEPLOY_GROUP
+  wait_until_deployed: true
+  on:
+    all_branches: true
