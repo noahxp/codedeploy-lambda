@@ -2,7 +2,7 @@ sudo: required
 
 language: node_js
 node_js:
-- 8
+- 12
 
 branches:
   only:
@@ -26,10 +26,10 @@ env:
   - secure: ""
   # AWS_SECRET_ACCESS_KEY_STG
   - secure: ""
-  # AWS_ACCESS_KEY_ID_PROD , value : AKI....QMQ
-  -
+  # AWS_ACCESS_KEY_ID_PROD
+  - secure: "xwdXMaSgO/iKr+W0sfnle9PCDGltve5g3B03amDnFqEelto4Pnk6xZbiLwh62mJktJTO3kN+DsgkI+U4nc3Ue5RQ4aoGJsFxnFcT5/2g2iU1XAqmXni4uxevqBJ8v1xYvU2LIIPwWN7SCaJUI1hemaXAwCx85efDqtakqssdAwmDkMGwwsIHwFyH59K2G7v4Ona03MFkLs9btyuLFlHpRh4o2cqPwgpvWALSEVpGRWkUuJdLTUzTMe/FnUOt3q+S2BFcmULchNC9jnPoUF/HD/yUxcQ/vL4lhkqYrWUjwhb9ijaTeVjXL0VO0PPl21HhKebv+WCkC8veCn1gAl5m19I8S1fNdB2E2TPs+F9POuixYTAt0QA09h7VlBCBeZIBDDUJHKmOCXRz1s5tzgwuWBI/ZQMAr6QPIu84MvdfO5rRadLNmFpFZtBz1DBBSVjS277lqVYrDLKAh0pkXgz3qwatkBGqTMHChhNkenLlAh2iDWRuKV4nyfpjj1DbNssvwdE3ocUUOnuJfxXAscOlCm/u0/paUKHQ+NtRg6MESJx7C+NQZT5r/UXPctaKVtHSHU0ThFtqxEotfY9SITOHz2KHOXuIsOyvWAVZ/jErB9lX4h66zLlX3Lr5ikptZ8oyxNX/4l1sweTZJKseTLBhA9nXsxddQt/1qksjGujJs88="
   # AWS_SECRET_ACCESS_KEY_PROD
-  -
+  - secure: "ULSNFLgVv2ICiHivjE/qd2ko6ZaSs0fiQbO8zT95Zg/BXAOmSQEXz7ngUUNxouGW941RIWAosjJ7M3LYfYQYMiMsdA0mHlCsRxG1sG3mRqI+C5TpSmlAVTt0L0Jl5QHpdDpoMOk7VCFleKg9iTd647DdUHMSWdcyJUi6xLUjKOL2ysiDF8tbKriPHTzWi4OsuR2LhLcOCABoL3dxxKNIxlSoYahWZYmw6DE4GjEZODxyIEklpNLN0nj6AeZdQhQW4hOjzmV2VmC1DER9BlkUrKUT9Srq3YLnHeIBqcFx/CD96kBlxcvezeTUyLtA7JeUINpaSMMySogTAnZhsXxbNu7IXTIev76Gwo6C/Hr1JdbK5Bcyenf/6Bwucb6e8tl/BdPF2zttN13OJAxaJyv8k1v8jKMBpabUFVr3PILRTM0gxJZLaeO4SmGDyN5oYPM+Ys+vp4CwNzp718xap10JozVp7Z5JIdBzaAHNH+xLDBrW+yl2OTkv2volctcHOyBQD57H10KKOue5/AkIivlO2NTw+DkeC0XoCTTCD5xDd0x0dRpWAP6PMdZDCmSMNRhCfyKczvkm9g6BKf1b2/DuwU8OVj7NKZDRxBqQ1RQD6EPFNZI4LOzyYqKolcKvOCDfwAb0fgVBGb79brcfz1aheDhQaJDnmWb4oNlWMNFj4EM="
 
   # global variables
   - AWS_ACCESS_KEY_ID=''
@@ -37,6 +37,7 @@ env:
   - AWS_REGION='ap-northeast-1'
   - CODEDEPLOY_APP_NAME=''
   - CODEDEPLOY_GROUP=''
+  - AWS_ACCOUNT_ID=''
 
 
 # notification - https://docs.travis-ci.com/user/notifications
@@ -54,12 +55,10 @@ notifications:
     on_success: never
   slack:
     rooms:
-    - secure: "OWaHJYnY7E/gcAxgqHUl5wqwc6oi1su77T2ixxmTl8hvO+fH66MQN9Mm1Ay6d5oaQqX4BNic9GdS7FI8h/osyHAf6NNhFZJleIzm9h3vWjlNh9ADwGbWRskue+6SyKY2vdB5HPiwstGUQoZ8/51wR19T43DwQ15dyCQKxg+WwK39+D3ps933wvFJsCQ+2RSLdImIN8B1CjpIbWxStBocZOprqxThAlYfupvMYrrRDt7mlVeMAnvXE4TmMfHdYXtKe9hc/mEfbCryL/CxN8e2JR1U2ropdkfmDOavPoc4PGtf+C3E5pLCm/rNx6Ldy2Y97qMSv6AuyHCMm8ie495wscRB2OmW7JIwRsFRg0jrJcm5CH/cS/Oy2wnmzPElQ50GcESh84E9HSV5tXF8iARHERVz1DF3PbJRRAd/KEyWcU+J/wbub3XX0PAsWBHix4BnvNgvwMbb0/Ie7UaCeZMzF0DQVopLd51DNIuTTmP/V9kpbEFgok2qatUrb2FiRNyRQVPYwQx8mRlS9sgGk7tChSTHsrqcS6/apmKUPAbI4NBPbB0BZBDlC/rHDr3iq77ht8DUcQnwJpXedIhHg7FAcHmRRuzC7+9gBiS/1g9/HjGkH46TaaR4P71s+BoOFVYfc2NTTAzqtxy6Fh1OWktK2WwdVEEk+mXEm0OQa9Cl1T8="
+    - secure: "HUUCwevc8Tr+x/zkAJy7crFwrfftHJK53VUfainBs9lyrOxqIwkVNBwJm5Fx6FPvBR2uYdFg+Wbx5ImESGtouGUT2DpJQLNEU8ln6nq69RJw6IXxCcWsT61W4uiY3etoMKhYp+z1oPZNsms6NdI90tthCclbczAiT3i8FBDZP6TS+lhh+bnbu/+bjUOjakmc4wTeTLxo0XKX34FOXqy7OmhMAVZWyPXFT66nXFeephn118xx2vCWSLrGTZJNsVxmQUlNU9UL70Q7G7xhkAawDCdmc0ooWv/Zr5auvLcSJlJ+rNQKRG0W3yuqrntu+cEEQd4MIbUSRfzn1xLL7D7E066WX0JQbCP9aaNtJsIzc1JbFi0FYfExEpqaQVz7pUwWlrt7PYJOLRIK2wCCrP+mOjP4kL9QHZzBao7OHmHiIhJHO7/hrx9jW89zFR9VqNRtGo13l//ViG5TPFSYAIcfLIQ63LCoTtzTz/nDLmgIxjHh1mGndG96DBDad3wL5DOIBfZ2I803bIQ3GYsN307PcAoUKBFoER4JSqolcbDLNJETsEFU3YJt9sESpu6ikxIALOTrWJo0g+0hMh5L3Uz0d2qNQgfCMb0A+WdMZiZvynjxmtNKBR1tk7eKfcrlbkHt5GaPQ88jiXE7n/AmI46AqLGwxByIfNIdb2n7GPNl2Cs="
 
 cache:
-  directories:
-  - $COMPOSER_CACHE_DIR
-  - $HOME/.composer/cache
+  npm: true
 
 
 
@@ -89,6 +88,7 @@ before_install:
     S3_BUCKET='';
     CODEDEPLOY_APP='';
     CODEDEPLOY_GROUP='';
+    AWS_ACCOUNT_ID='';
   fi
 - if [[ $TRAVIS_BRANCH == "staging" ]]; then
     AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_STG;
@@ -96,24 +96,29 @@ before_install:
     S3_BUCKET='';
     CODEDEPLOY_APP='';
     CODEDEPLOY_GROUP='';
+    AWS_ACCOUNT_ID='';
   fi
 - if [[ $TRAVIS_BRANCH == "master" ]]; then
     AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_PROD;
     AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_PROD;
     S3_BUCKET='afgsfhdyur5joi868682333';
-    CODEDEPLOY_APP='a1-EC2-CodeDeploy';
-    CODEDEPLOY_GROUP='ec2';
+    CODEDEPLOY_APP='a1-Lambda-CodeDeploy';
+    CODEDEPLOY_GROUP='lambda';
+    AWS_ACCOUNT_ID='796957138374';
   fi
 
+# install:
+  # - pip install awscli
 
 # put testing scripts here
 script:
-- echo 'script step...'
+  - echo 'script step...'
 
-before_deploy:
-- cd "$TRAVIS_BUILD_DIR";
-  mkdir "$TRAVIS_BUILD_DIR/zip";
-  zip -r "$TRAVIS_BUILD_DIR/zip/$ZIP_FILE" *
+after_success:
+  - cd "$TRAVIS_BUILD_DIR";
+  - mkdir "$TRAVIS_BUILD_DIR/zip";
+  - zip -r "$TRAVIS_BUILD_DIR/zip/$ZIP_FILE" *;
+  - cp "$TRAVIS_BUILD_DIR/zip/$ZIP_FILE" "$TRAVIS_BUILD_DIR/zip/lambda.zip";
 
 
 deploy:
@@ -127,15 +132,24 @@ deploy:
   on:
     all_branches: true
 
-- provider: codedeploy
-  access_key_id: $AWS_ACCESS_KEY_ID
-  secret_access_key: $AWS_SECRET_ACCESS_KEY
+
+- provider: lambda
+  function_name: demo-lambda
   region: $AWS_REGION
-  bucket: $S3_BUCKET
-  key: $ZIP_FILE
-  bundle_type: zip
-  application: $CODEDEPLOY_APP
-  deployment_group: $CODEDEPLOY_GROUP
-  wait_until_deployed: true
-  on:
-    all_branches: true
+  role: !Sub arn:aws:iam::${AWS_ACCOUNT_ID}:role/lambda_basic_execution
+  runtime: nodejs12.x
+  handler_name: handler
+
+
+# - provider: codedeploy
+#   access_key_id: $AWS_ACCESS_KEY_ID
+#   secret_access_key: $AWS_SECRET_ACCESS_KEY
+#   region: $AWS_REGION
+#   bucket: $S3_BUCKET
+#   key: $ZIP_FILE
+#   bundle_type: zip
+#   application: $CODEDEPLOY_APP
+#   deployment_group: $CODEDEPLOY_GROUP
+#   wait_until_deployed: true
+#   on:
+#     all_branches: true
